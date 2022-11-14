@@ -6,7 +6,8 @@ app.secret_key = "oiusdfghoisbfkjlasbfæiauhsfdlais"
 
 users = [
     ["admin", "password"],
-    ["hej", "test"]
+    ["hej", "test"],
+    ["sebbe1231", "lol"]
 ]
 
 @app.route("/")
@@ -31,6 +32,10 @@ def logincheck():
     
     session["loggedin"] = query
     return jsonify({"status": True})
+
+@app.get("/logout")
+def logout():
+    return session.pop('loggedin', None)
 
 @app.get("/getuser")
 def getuser():

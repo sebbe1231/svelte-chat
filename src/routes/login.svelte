@@ -1,6 +1,7 @@
 <script>
     import Swal from "sweetalert2";
     import { navigate } from "svelte-routing";
+    import Register from "../components/register.svelte"
 
     let name;
     let pass;
@@ -49,17 +50,19 @@
 </script>
 
 <div class="container mt-4">
+    <Register />
     <form on:submit|preventDefault on:submit={loginfunc} id="loginform">
         <div class="form-outline mb-4">
-        <input bind:value={name} type="text" id="loginname" class="form-control" />
-        <label class="form-label" for="loginname">Username</label>
+            <input bind:value={name} type="text" id="loginname" class="form-control" />
+            <label class="form-label" for="loginname">Username</label>
         </div>
     
         <div class="form-outline mb-4">
-        <input bind:value={pass} type="password" id="loginpass" class="form-control" />
-        <label class="form-label" for="loginpass">Password</label>
+            <input bind:value={pass} type="password" id="loginpass" class="form-control" />
+            <label class="form-label" for="loginpass">Password</label>
         </div>
 
         <button type="submit" class="btn btn-primary btn-block mb-4">Sign in</button>
+        <button type="button" class="btn btn-secondary btn-block mb-4" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
     </form>
 </div>
