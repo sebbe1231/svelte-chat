@@ -25,3 +25,6 @@ dist-ssr
 
 # ENV, no peaking :)
 .env
+
+# Database :O
+database.db
