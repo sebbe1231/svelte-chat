@@ -2,12 +2,35 @@
 <script>
     import Swal from "sweetalert2"
     import { navigate } from "svelte-routing";
+    import { user } from "../lib/stores"
     import jquery from "jquery";
 
     let name;
     let pass;
+    let passcon;
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+    })
 
     function registerUser(){
+        if (pass !== passcon){
+            return Toast.fire({
+                text: "Passwords do not match",
+                icon: "error"
+            })
+        }
+        if(pass === undefined || name === undefined){
+            return Toast.fire({
+                text: "Error",
+                icon: "error"
+            });
+        }
+
         const details = [
             name,
             pass
@@ -21,28 +44,21 @@
             }
         }).then(rep => rep.json()).then(data => {
             if (data["status"] === true) {
+                user.set(name)
                 navigate("/");
+
+                // Bit cursed, but the modal backdrop stayes on route for some reason, so i have to delete it
                 jquery(".modal-backdrop").remove()
 
-                Swal.fire({
+                Toast.fire({
                     text: "Account created",
                     icon: "success",
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true,
                 });
             }
             else{
-                Swal.fire({
+                Toast.fire({
                     text: "Username already exists",
                     icon: "error",
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 2000,
-                    timerProgressBar: true,
                 });
             }
         })
@@ -70,7 +86,7 @@
                     </div>
 
                     <div class="form-outline mb-4">
-                        <input type="password" id="regpasscon" class="form-control" />
+                        <input bind:value={passcon} type="password" id="regpasscon" class="form-control" />
                         <label class="form-label" for="regpass">Confirm password</label>
                     </div>
                 </div>

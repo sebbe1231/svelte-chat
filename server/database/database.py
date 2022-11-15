@@ -29,7 +29,7 @@ def db_search_user(username):
     con = sqlite3.connect("database.db")
     cur = con.cursor()
 
-    res = cur.execute(f"SELECT * FROM users WHERE name = '{username}'").fetchone()
+    res = cur.execute(f"SELECT * FROM users WHERE name = :username", {"username": username}).fetchone()
 
     con.close()
 
@@ -40,7 +40,7 @@ def db_login(username, password):
     con = sqlite3.connect("database.db")
     cur = con.cursor()
 
-    hashPasswrd = cur.execute(f"SELECT password FROM users WHERE name = '{username}'")
+    hashPasswrd = cur.execute(f"SELECT password FROM users WHERE name = :username", {"username": username}).fetchone()[0]
 
     if bcrypt.checkpw(password.encode('utf8'), hashPasswrd):
         con.close()

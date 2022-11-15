@@ -5,13 +5,7 @@ import bcrypt
 
 
 app = Flask(__name__, static_folder="./dist/", static_url_path="/")
-app.secret_key = "oiusdfghoisbfkjlasbfæiauhsfdlais"
-
-users = [
-    ["admin", "password"],
-    ["hej", "test"],
-    ["sebbe1231", "lol"]
-]
+app.secret_key = environ["APP_SECRET"]
 
 # Root
 @app.route("/")
@@ -29,7 +23,6 @@ def login():
 # Check if login details are valid
 @app.post("/logincheck")
 def logincheck():
-    # [Username, Password]
     query = request.json.get("details")
 
     res = database.db_login(query[0], query[1])
@@ -37,21 +30,13 @@ def logincheck():
     if res == False:
         return jsonify({"status": False, "message": "Wrong login"})
     
-    session["loggedin"] = query
+    session["loggedin"] = query[0]
     return jsonify({"status": True})
 
 # Logout
 @app.get("/logout")
 def logout():
     return session.pop('loggedin', None)
-
-# Get the current session user, im not sure im gonna need this but eh ill keep it for now
-@app.get("/getuser")
-def getuser():
-    if not "loggedin" in session:
-        return jsonify({"status": False, "message": "No user logged in on session"})
-    
-    return jsonify({"status": True, "data": session["loggedin"]})
 
 # Register account if not exists in database
 @app.post("/register")
@@ -65,8 +50,17 @@ def register():
     hashed = bcrypt.hashpw(query[1].encode('utf8'), salt)
 
     database.db_register(query[0], hashed)
-    session["loggedin"] = [query[0], hashed]
+    session["loggedin"] = query[0]
     return jsonify({"status": True})
+
+# Updates user in store.js on new build
+# i know its pretty cursed, BUT, cope
+@app.get("/getuser")
+def getuser():
+    if not "loggedin" in session:
+        return jsonify({"status": False, "message": "No user in session"})
+
+    return jsonify({"status": True, "data": session["loggedin"]})
 
 if __name__ == '__main__':
     app.run("0.0.0.0", 8000, True)

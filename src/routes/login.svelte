@@ -1,6 +1,7 @@
 <script>
     import Swal from "sweetalert2";
     import { navigate } from "svelte-routing";
+    import { user } from "../lib/stores"
     import Register from "../components/register.svelte"
 
     let name;
@@ -19,9 +20,8 @@
                 'Content-Type': 'application/json'
             }
         }).then(rep => rep.json()).then(data => {
-            console.log(data);
-
             if (data["status"] === true) {
+                user.set(name)
                 navigate("/")
 
                 Swal.fire({
