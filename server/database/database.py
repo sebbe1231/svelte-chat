@@ -64,15 +64,17 @@ def db_add_msg(user, reciver, content):
     con.commit()
     con.close()
 
-def db_get_msg(user: list, reciver: list, amount: int):
+def db_get_msg(user: list, receiver: list, amount: int):
     con = sqlite3.connect("database.db")
     cur = con.cursor()
 
-    if reciver is None:
-        res = cur.execute("SELECT * FROM messages WHERE user = :user", {"user": user}).fetchmany(amount)
+    if receiver is None:
+        res = cur.execute("SELECT * FROM messages WHERE user = :user OR receiver = :user", {"user": user}).fetchmany(amount)
+        con.close()
         return res
 
-    res = cur.execute("SELECT * FROM messages WHERE user = :user AND receiver = :receiver", {"user": user, "receiver": reciver}).fetchmany(amount)
+    res = cur.execute("SELECT * FROM messages WHERE user IN :users AND receiver IN :users", {"users": [user, receiver]}).fetchmany(amount)
+    con.close()
     return res
 
-    con.close()
+    

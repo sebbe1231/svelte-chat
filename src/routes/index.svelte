@@ -2,10 +2,32 @@
     import Navbar from "../components/navbar.svelte"
     import { user } from "../lib/stores"
     import Swal from "sweetalert2"
-    import { get } from "svelte/store";
+    import { onMount } from 'svelte';
+    import { writable } from 'svelte/store';
+    
+    const messages = writable(null);
 
     let reciver;
     let content;
+
+    const get_msg = async () => {
+        const details = [
+            $user,
+            10
+        ]
+
+        const resp = await fetch("/getmessage", {
+            method: "POST",
+            body: JSON.stringify({details}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await resp.json();
+        $messages = data.data
+    }
+
+    onMount(get_msg);
 
     const Toast = Swal.mixin({
         toast: true,
@@ -14,8 +36,6 @@
         timer: 2000,
         timerProgressBar: true,
     })
-
-    
 
     function send_message(){
         const details = [
@@ -43,7 +63,7 @@
                 })
             }
         })
-    }
+    }    
 </script>
 
 <Navbar />
@@ -64,7 +84,13 @@
         <button type="submit" class="btn btn-primary btn-block mb-4">Send</button>
     </form>
     <ul class="list-group">
-        <li class="list-group-item">lol</li>
+    {#if $messages === null}
+        <p>Loading...</p>
+    {:else}
+        {#each $messages as m}
+            <li class="list-group-item">{m}</li>
+        {/each}
+    {/if}
     </ul>
 </div>
 

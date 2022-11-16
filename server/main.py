@@ -79,7 +79,7 @@ def getmessage():
 
     if not "loggedin" in session:
         return jsonify({"status": False, "message": "No user in session"})
-
+    
     res = database.db_get_msg(session["loggedin"], query[0], query[1])
 
     return jsonify({"status": True, "data": res})
