@@ -62,5 +62,27 @@ def getuser():
 
     return jsonify({"status": True, "data": session["loggedin"]})
 
+@app.post("/sendmessage")
+def sendmessage():
+    query = request.json.get("details")
+
+    if not "loggedin" in session:
+        return jsonify({"status": False, "message": "No user in session"})
+    
+    database.db_add_msg(session["loggedin"], query[0], query[1])
+
+    return jsonify({"status": True})
+
+@app.post("/getmessage")
+def getmessage():
+    query = request.json.get("details")
+
+    if not "loggedin" in session:
+        return jsonify({"status": False, "message": "No user in session"})
+
+    res = database.db_get_msg(session["loggedin"], query[0], query[1])
+
+    return jsonify({"status": True, "data": res})
+
 if __name__ == '__main__':
     app.run("0.0.0.0", 8000, True)

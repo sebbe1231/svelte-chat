@@ -1,11 +1,12 @@
 import sqlite3
 import bcrypt
+from datetime import datetime
 
 con = sqlite3.connect("database.db")
 cur = con.cursor()
 
 cur.execute("CREATE TABLE IF NOT EXISTS [users] (id integer NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,name text NOT NULL UNIQUE,password text NOT NULL)")
-cur.execute("CREATE TABLE IF NOT EXISTS [messages] (id integer NOT NULL PRIMARY KEY AUTOINCREMENT,user_id integer NOT NULL,receiver_id integer NOT NULL,content text NOT NULL,sent_date date NOT NULL)")
+cur.execute("CREATE TABLE IF NOT EXISTS [messages] (id integer NOT NULL PRIMARY KEY AUTOINCREMENT,user text NOT NULL,receiver text NOT NULL,content text NOT NULL,sent_date date NOT NULL)")
 
 con.commit()
 con.close()
@@ -40,11 +41,38 @@ def db_login(username, password):
     con = sqlite3.connect("database.db")
     cur = con.cursor()
 
-    hashPasswrd = cur.execute(f"SELECT password FROM users WHERE name = :username", {"username": username}).fetchone()[0]
+    try:
+        hashPasswrd = cur.execute(f"SELECT password FROM users WHERE name = :username", {"username": username}).fetchone()[0]
+    except TypeError:
+        return False
 
     if bcrypt.checkpw(password.encode('utf8'), hashPasswrd):
         con.close()
         return True
     else:
         con.close()
-        return False 
+        return False
+    
+def db_add_msg(user, reciver, content):
+    con = sqlite3.connect("database.db")
+    cur = con.cursor()
+
+    date = datetime.now()
+
+    cur.execute(f"INSERT INTO messages(user, receiver, content, sent_date) VALUES(?, ?, ?, ?)", (user, reciver, content, date))
+
+    con.commit()
+    con.close()
+
+def db_get_msg(user: list, reciver: list, amount: int):
+    con = sqlite3.connect("database.db")
+    cur = con.cursor()
+
+    if reciver is None:
+        res = cur.execute("SELECT * FROM messages WHERE user = :user", {"user": user}).fetchmany(amount)
+        return res
+
+    res = cur.execute("SELECT * FROM messages WHERE user = :user AND receiver = :receiver", {"user": user, "receiver": reciver}).fetchmany(amount)
+    return res
+
+    con.close()
