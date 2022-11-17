@@ -21,8 +21,10 @@ def db_register(username, password):
             (?, ?)
     """, (username, password))
 
+    res = cur.execute("SELECT id, name, password FROM users WHERE name = :username", {"username": username}).fetchone()
     con.commit()
     con.close()
+    return {"status": True, "data": res}
 
 # Search for user in database via username
 # Userfull for checking if user exists under registration
@@ -33,7 +35,6 @@ def db_search_user(username):
     res = cur.execute(f"SELECT * FROM users WHERE name = :username", {"username": username}).fetchone()
 
     con.close()
-
     return res
 
 # Check if login details are in database
@@ -42,16 +43,18 @@ def db_login(username, password):
     cur = con.cursor()
 
     try:
-        hashPasswrd = cur.execute(f"SELECT password FROM users WHERE name = :username", {"username": username}).fetchone()[0]
+        hashPasswrd = cur.execute(f"SELECT id, name, password FROM users WHERE name = :username", {"username": username}).fetchone()
     except TypeError:
+        con.close()
         return False
 
-    if bcrypt.checkpw(password.encode('utf8'), hashPasswrd):
+    if bcrypt.checkpw(password.encode('utf8'), hashPasswrd[2]):
         con.close()
-        return True
+        return {"status": True, "data": hashPasswrd}
     else:
         con.close()
-        return False
+        return {"status": False}
+    
     
 def db_add_msg(user, reciver, content):
     con = sqlite3.connect("database.db")
@@ -70,7 +73,7 @@ def db_get_msg(user: list, receiver: list, amount: int):
 
     if receiver is None:
         res = cur.execute("SELECT * FROM messages WHERE user = :user OR receiver = :user", {"user": user}).fetchmany(amount)
-        con.close()
+        cur.close()
         return res
 
     res = cur.execute("SELECT * FROM messages WHERE user IN :users AND receiver IN :users", {"users": [user, receiver]}).fetchmany(amount)

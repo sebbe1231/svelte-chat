@@ -44,7 +44,7 @@
             }
         }).then(rep => rep.json()).then(data => {
             if (data["status"] === true) {
-                user.set(name)
+                user.set(data.data)
                 navigate("/");
 
                 // Bit cursed, but the modal backdrop stayes on route for some reason, so i have to delete it

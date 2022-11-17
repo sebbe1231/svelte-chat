@@ -21,7 +21,7 @@
             }
         }).then(rep => rep.json()).then(data => {
             if (data["status"] === true) {
-                user.set(name)
+                user.set(data.data)
                 navigate("/")
 
                 Swal.fire({

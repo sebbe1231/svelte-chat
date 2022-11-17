@@ -3,8 +3,18 @@ import "jquery"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap';
 
-const app = new App({
-  target: document.getElementById('app')
-})
+import { user } from './lib/stores';
 
-export default app
+
+const buildApp = () => {
+  const app = new App({
+    target: document.getElementById('app')
+  })
+}
+
+fetch("/me")
+  .then(resp => resp.json())
+  .then(data => {
+    user.set(data.data)
+  })
+  .finally(buildApp)

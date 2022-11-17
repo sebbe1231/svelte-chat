@@ -27,11 +27,15 @@ def logincheck():
 
     res = database.db_login(query[0], query[1])
 
-    if res == False:
+    if res["status"] == False:
         return jsonify({"status": False, "message": "Wrong login"})
     
-    session["loggedin"] = query[0]
-    return jsonify({"status": True})
+    session["loggedin"] = {
+        "id": res["data"][0],
+        "username": res["data"][1]
+    }
+
+    return jsonify({"status": True, "data": session["loggedin"]})
 
 # Logout
 @app.get("/logout")
@@ -49,14 +53,18 @@ def register():
     salt = bcrypt.gensalt()
     hashed = bcrypt.hashpw(query[1].encode('utf8'), salt)
 
-    database.db_register(query[0], hashed)
+    res = database.db_register(query[0], hashed)
+    session["loggedin"] = {
+        "id": res["data"][0],
+        "username": res["data"][1]
+    }
     session["loggedin"] = query[0]
-    return jsonify({"status": True})
+    return jsonify({"status": True, "data": session["loggedin"]})
 
 # Updates user in store.js on new build
 # i know its pretty cursed, BUT, cope
-@app.get("/getuser")
-def getuser():
+@app.get("/me")
+def me():
     if not "loggedin" in session:
         return jsonify({"status": False, "message": "No user in session"})
 
