@@ -3,12 +3,14 @@
 
   import Index from "./routes/index.svelte";
   import Login from "./routes/login.svelte";
+  import Message from "./routes/message.svelte"
 </script>
 
 <Router>
   <div>
     <Route path="/"><Index /></Route>
     <Route path="/login"><Login /></Route>
+    <Route path="/message/:id" let:params><Message id="{params.id}"/></Route>
   </div>
 </Router>
 

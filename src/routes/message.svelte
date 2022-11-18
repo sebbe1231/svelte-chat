@@ -2,16 +2,30 @@
     import { writable } from "svelte/store";
     import { user } from "../lib/stores";
     import { SwalToast } from "../lib/helpers";
+    import { onMount } from "svelte";
 
-    let recipient;
+    const id = location.pathname.split("/").at(-1)
 
     let chatField;
 
     const messages = writable(null);
 
-    const getMessages = async () => {
-        
-    };
+    const get_user = async () => {
+        const details = [
+            id
+        ]
+
+        const resp = await fetch("/getmessage", {
+            method: "POST",
+            body: JSON.stringify({details}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await resp.json();
+        $messages = data.data
+    }
+    onMount(get_user)
     
     function send_message(){
         const details = [
@@ -57,14 +71,10 @@
         const data = await resp.json();
         $messages = data.data
     }
+    onMount(get_msg)
 </script>
 
 <form on:submit|preventDefault on:submit={send_message} id="loginform">
-    <div class="form-outline mb-4">
-        <label class="form-label" for="ireciver">Who will you send it to?</label>
-        <input bind:value={recipient} type="text" id="ireciver" class="form-control" />
-    </div>
-
     <div class="form-outline mb-4">
         <input bind:value={chatField} type="text" id="icontent" class="form-control" />
     </div>

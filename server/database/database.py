@@ -6,7 +6,15 @@ con = sqlite3.connect("database.db")
 cur = con.cursor()
 
 cur.execute("CREATE TABLE IF NOT EXISTS [users] (id integer NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,name text NOT NULL UNIQUE,password text NOT NULL)")
-cur.execute("CREATE TABLE IF NOT EXISTS [messages] (id integer NOT NULL PRIMARY KEY AUTOINCREMENT,user text NOT NULL,receiver text NOT NULL,content text NOT NULL,sent_date date NOT NULL)")
+cur.execute("""
+    CREATE TABLE IF NOT EXISTS [messages] 
+    (id integer NOT NULL PRIMARY KEY AUTOINCREMENT,
+    user integer NOT NULL,
+    receiver integer NOT NULL,
+    content text NOT NULL,
+    sent_date date NOT NULL)
+    FOREIGN KEY(user) REFERENCES users(id)
+    FOREIGN KEY(receiver) REFERENCES users(id)""")
 
 con.commit()
 con.close()
@@ -32,7 +40,7 @@ def db_search_user(username):
     con = sqlite3.connect("database.db")
     cur = con.cursor()
 
-    res = cur.execute(f"SELECT * FROM users WHERE name = :username", {"username": username}).fetchone()
+    res = cur.execute(f"SELECT id, name FROM users WHERE name = :username", {"username": username}).fetchone()
 
     con.close()
     return res

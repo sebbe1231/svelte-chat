@@ -20,6 +20,10 @@ def index():
 def login():
     return send_file("dist/index.html")
 
+@app.route("/message/<id>")
+def message(id):
+    return send_file("dist/index.html")
+
 # Check if login details are valid
 @app.post("/logincheck")
 def logincheck():
@@ -89,6 +93,17 @@ def getmessage():
         return jsonify({"status": False, "message": "No user in session"})
     
     res = database.db_get_msg(session["loggedin"], query[0], query[1])
+
+    return jsonify({"status": True, "data": res})
+
+@app.post("/getuser")
+def getuser():
+    query = request.json.get("details")
+
+    if database.db_search_user(query[0]) == None:
+        return jsonify({"status": False, "message": "Account does not exist"})
+    
+    res = database.db_search_user(query[0])
 
     return jsonify({"status": True, "data": res})
 
