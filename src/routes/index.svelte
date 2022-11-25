@@ -11,6 +11,8 @@
             recipient
         ]
 
+        console.log(recipient)
+
         fetch("/getuser", {
             method: "POST",
             body: JSON.stringify({details}),
@@ -18,7 +20,6 @@
                 'Content-Type': 'application/json'
             }
         }).then(rep => rep.json()).then(data => {
-            console.log(data)
             navigate(`/message/${data.data[0]}`)
         })
     }

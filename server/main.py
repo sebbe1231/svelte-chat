@@ -105,6 +105,9 @@ def getuser():
     
     res = database.db_search_user(query[0])
 
+    print("resp")
+    print(res)
+
     return jsonify({"status": True, "data": res})
 
 if __name__ == '__main__':

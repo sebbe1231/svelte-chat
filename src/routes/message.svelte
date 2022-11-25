@@ -3,19 +3,21 @@
     import { user } from "../lib/stores";
     import { SwalToast } from "../lib/helpers";
     import { onMount } from "svelte";
+    import Navbar from "../components/navbar.svelte"
 
     const id = location.pathname.split("/").at(-1)
 
     let chatField;
 
     const messages = writable(null);
+    const recepiant = writable(null);
 
     const get_user = async () => {
         const details = [
             id
         ]
 
-        const resp = await fetch("/getmessage", {
+        const resp = await fetch("/getuser", {
             method: "POST",
             body: JSON.stringify({details}),
             headers: {
@@ -23,13 +25,14 @@
             }
         });
         const data = await resp.json();
-        $messages = data.data
+        $recepiant = data.data[1]
+        console.log("hej")
     }
     onMount(get_user)
     
     function send_message(){
         const details = [
-            recipient,
+            id,
             chatField
         ]
 
@@ -57,7 +60,7 @@
     
     const get_msg = async () => {
         const details = [
-            $user,
+            $recepiant,
             10
         ]
 
@@ -74,10 +77,26 @@
     onMount(get_msg)
 </script>
 
-<form on:submit|preventDefault on:submit={send_message} id="loginform">
-    <div class="form-outline mb-4">
-        <input bind:value={chatField} type="text" id="icontent" class="form-control" />
+<Navbar />
+<div class="container mt-4">
+    <div class="d-flex flex-column">
+        <h1>{$recepiant}</h1>
+        <div id="text-area" class="border align-self-stretch">
+            <ul class="list-group">
+                {#if $messages}
+                    {#each $messages as msg}
+                        <li class="list-group-item list-group-item-primary">{msg}</li>
+                    {/each}
+                {/if}
+            </ul>
+        </div>
+        <div>
+            <form on:submit={send_message} id="loginform">
+                <div class="input-group mb-3">
+                    <input bind:value={chatField} type="text" id="icontent" class="form-control" />
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <button type="submit" class="btn btn-primary btn-block mb-4">Send</button>
-</form>
+</div>

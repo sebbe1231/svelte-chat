@@ -13,8 +13,7 @@ cur.execute("""
     receiver integer NOT NULL,
     content text NOT NULL,
     sent_date date NOT NULL)
-    FOREIGN KEY(user) REFERENCES users(id)
-    FOREIGN KEY(receiver) REFERENCES users(id)""")
+    """)
 
 con.commit()
 con.close()
@@ -36,11 +35,11 @@ def db_register(username, password):
 
 # Search for user in database via username
 # Userfull for checking if user exists under registration
-def db_search_user(username):
+def db_search_user(username, id):
     con = sqlite3.connect("database.db")
     cur = con.cursor()
 
-    res = cur.execute(f"SELECT id, name FROM users WHERE name = :username", {"username": username}).fetchone()
+    res = cur.execute(f"SELECT id, name FROM users WHERE name = :name", {"name": username}).fetchone()
 
     con.close()
     return res
@@ -51,10 +50,13 @@ def db_login(username, password):
     cur = con.cursor()
 
     try:
-        hashPasswrd = cur.execute(f"SELECT id, name, password FROM users WHERE name = :username", {"username": username}).fetchone()
+        hashPasswrd = cur.execute(f"SELECT * FROM users WHERE name = :username", {"username": username}).fetchone()
     except TypeError:
         con.close()
         return False
+    
+    if hashPasswrd is None:
+        return {"status": False}
 
     if bcrypt.checkpw(password.encode('utf8'), hashPasswrd[2]):
         con.close()
