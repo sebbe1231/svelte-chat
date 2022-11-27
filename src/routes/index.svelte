@@ -8,7 +8,8 @@
 
     function redirect_message(){
         const details = [
-            recipient
+            recipient,
+            null
         ]
 
         console.log(recipient)
@@ -20,7 +21,7 @@
                 'Content-Type': 'application/json'
             }
         }).then(rep => rep.json()).then(data => {
-            navigate(`/message/${data.data[0]}`)
+            navigate(`/message/${data.data.id}`)
         })
     }
 </script>

@@ -51,7 +51,7 @@ def logout():
 def register():
     query = request.json.get("details")
 
-    if database.db_search_user(query[0]) != None:
+    if database.db_search_user(query[0], None) != None:
         return jsonify({"status": False, "message": "Account with username already exists"})
 
     salt = bcrypt.gensalt()
@@ -81,7 +81,7 @@ def sendmessage():
     if not "loggedin" in session:
         return jsonify({"status": False, "message": "No user in session"})
     
-    database.db_add_msg(session["loggedin"], query[0], query[1])
+    database.db_add_msg(session["loggedin"]["id"], query[0], query[1])
 
     return jsonify({"status": True})
 
@@ -92,7 +92,7 @@ def getmessage():
     if not "loggedin" in session:
         return jsonify({"status": False, "message": "No user in session"})
     
-    res = database.db_get_msg(session["loggedin"], query[0], query[1])
+    res = database.db_get_msg(session["loggedin"]["id"], query[0], query[1])
 
     return jsonify({"status": True, "data": res})
 
@@ -100,13 +100,15 @@ def getmessage():
 def getuser():
     query = request.json.get("details")
 
-    if database.db_search_user(query[0]) == None:
-        return jsonify({"status": False, "message": "Account does not exist"})
-    
-    res = database.db_search_user(query[0])
+    res = database.db_search_user(query[0], query[1])
 
-    print("resp")
-    print(res)
+    if res is None:
+        return jsonify({"status": False, "message": "Account does not exist"})
+
+    res = {
+        "id": res[0],
+        "username": res[1]
+    }
 
     return jsonify({"status": True, "data": res})
 

@@ -14,6 +14,7 @@
 
     const get_user = async () => {
         const details = [
+            null,
             id
         ]
 
@@ -25,8 +26,7 @@
             }
         });
         const data = await resp.json();
-        $recepiant = data.data[1]
-        console.log("hej")
+        $recepiant = data.data;
     }
     onMount(get_user)
     
@@ -60,7 +60,7 @@
     
     const get_msg = async () => {
         const details = [
-            $recepiant,
+            id,
             10
         ]
 
@@ -85,7 +85,23 @@
             <ul class="list-group">
                 {#if $messages}
                     {#each $messages as msg}
-                        <li class="list-group-item list-group-item-primary">{msg}</li>
+                        {#if msg[1] == id}
+                            <li class="list-group-item list-group-item-primary">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{$user.username} ({$user.id})</h5>
+                                    <small>{msg[4]}</small>
+                                </div>
+                                <p class="mb-1">{msg[3]}</p>
+                            </li>
+                        {:else}
+                            <li class="list-group-item list-group-item-secondary">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{$recepiant.username} ({$recepiant.id})</h5>
+                                    <small>{msg[4]}</small>
+                                </div>
+                                <p class="mb-1">{msg[3]}</p>
+                            </li>
+                        {/if}
                     {/each}
                 {/if}
             </ul>

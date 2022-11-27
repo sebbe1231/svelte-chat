@@ -39,7 +39,11 @@ def db_search_user(username, id):
     con = sqlite3.connect("database.db")
     cur = con.cursor()
 
-    res = cur.execute(f"SELECT id, name FROM users WHERE name = :name", {"name": username}).fetchone()
+    if username is not None:
+        res = cur.execute(f"SELECT id, name FROM users WHERE name = :name", {"name": username}).fetchone()
+    
+    if id is not None:
+        res = cur.execute(f"SELECT id, name FROM users WHERE id = :id", {"id": id}).fetchone()
 
     con.close()
     return res
@@ -77,7 +81,7 @@ def db_add_msg(user, reciver, content):
     con.commit()
     con.close()
 
-def db_get_msg(user: list, receiver: list, amount: int):
+def db_get_msg(user, receiver, amount: int):
     con = sqlite3.connect("database.db")
     cur = con.cursor()
 
@@ -86,7 +90,7 @@ def db_get_msg(user: list, receiver: list, amount: int):
         cur.close()
         return res
 
-    res = cur.execute("SELECT * FROM messages WHERE user IN :users AND receiver IN :users", {"users": [user, receiver]}).fetchmany(amount)
+    res = cur.execute("SELECT * FROM messages WHERE (user = :user AND receiver = :receiver) OR (user = :receiver AND receiver = :user)", {"user": user, "receiver": receiver}).fetchmany(amount)
     con.close()
     return res
 
