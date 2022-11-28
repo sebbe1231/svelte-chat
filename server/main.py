@@ -62,7 +62,6 @@ def register():
         "id": res["data"][0],
         "username": res["data"][1]
     }
-    session["loggedin"] = query[0]
     return jsonify({"status": True, "data": session["loggedin"]})
 
 # Updates user in store.js on new build

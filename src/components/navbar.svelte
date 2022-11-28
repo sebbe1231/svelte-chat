@@ -1,5 +1,6 @@
 <script>
     import { navigate } from "svelte-routing";
+    import { user } from "../lib/stores";
     import Swal from "sweetalert2";
 
     function logout(){
@@ -20,7 +21,7 @@
     }
 </script>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container-fluid">
         <div class="border-end mx-2">
             <span class="navbar-brand">chatsite</span>
@@ -31,6 +32,7 @@
                 <a class="nav-link mx-2" href="/login">Login</a>
             </div>
         </div>
+        <span class="text-white">{$user.username}</span>
         <button type="button" on:click={logout} id="logoutbtn" class="mx-2 btn btn-danger">logout</button>
     </div>
 </nav>
